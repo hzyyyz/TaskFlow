@@ -2,7 +2,14 @@
 
 ## 当前阶段
 
-阶段四：自动化测试、文档与交付。当前环境可执行的最终验收已完成；Git 忽略规则已在新建本地仓库中验证，独立的本机 MySQL 8.0.46 实库迁移与接口链路也已通过。验收细目见 [ACCEPTANCE.md](ACCEPTANCE.md)，技术说明见 [INTERVIEW_NOTES.md](INTERVIEW_NOTES.md)。
+阶段四已完成；随后完成 GitHub 仓库交付。自动化测试和独立的本机 MySQL 8.0.46 实库迁移、接口链路均已通过；代码已推送到私有仓库 `hzyyyz/TaskFlow` 的 `main` 分支。验收细目见 [ACCEPTANCE.md](ACCEPTANCE.md)，技术说明见 [INTERVIEW_NOTES.md](INTERVIEW_NOTES.md)。
+
+## GitHub 仓库交付
+
+- 创建私有仓库 `https://github.com/hzyyyz/TaskFlow`，本地 `origin` 指向其 HTTPS 地址。
+- 推送前 `python -m pytest -q`：47 passed、1 条第三方弃用警告；`git diff --cached --check`：退出码 0；首次提交 `7dc646d`（`Initial TaskFlow MVP`）。
+- `git push -u origin main`：成功创建远程 `main`，本地 `main` 跟踪 `origin/main`。推送候选文件仅包含项目代码、测试与文档；`.env` 和 `.mysql-test/` 被 Git 忽略。
+- 本进度与验收报告随仓库交付记录同步到远程仓库。
 
 ## 阶段四已完成
 
@@ -22,7 +29,7 @@
 - 启动真实 Uvicorn，并用 HTTPX 完成 `/health`、`/docs`、OpenAPI、注册→登录→`/me`→任务创建→列表→详情→更新→删除链路，状态码分别符合契约，删除为空响应体。
 - 用占位 MySQL URL 执行 `python -m alembic upgrade head --sql`：生成 users/tasks、外键、索引及枚举 CHECK 的离线 SQL；未连接 MySQL。
 - `rg` 核对 `app/` 与 `alembic/` 不调用 `create_all()`，`app/` 与依赖文件没有总控禁止的运行组件。
-- 初始化本地 `main` Git 仓库；`git check-ignore -v --no-index` 确认 `.env` 与 `.env.*` 被忽略、`.env.example` 保留；`git add --dry-run .` 未列出敏感环境文件。当前无提交或远程地址。
+- 初始化本地 `main` Git 仓库；`git check-ignore -v --no-index` 确认 `.env` 与 `.env.*` 被忽略、`.env.example` 保留；`git add --dry-run .` 未列出敏感环境文件。阶段四验收当时尚无提交或远程地址，随后已完成仓库交付。
 - 对独立 MySQL 8.0.46 空库执行 `python -m alembic upgrade head`：成功；`python -m alembic current`：`0001_initial (head)`；`python -m alembic check`：No new upgrade operations detected。通过 SQLAlchemy 实际检查 users/tasks 字段、owner 索引、外键和 status/priority CHECK 约束。
 - 在该 MySQL 实库上启动 Uvicorn，并用 HTTPX 验证健康检查、文档、双用户注册/登录、`/me`、任务创建/列表/更新/删除、跨用户 404、未认证 401、非法分页 422、UTC 时间和 204 空响应体，结果均符合契约。
 - 创建 `.env` 后再次执行 `python -m pytest -q`：47 passed；`ruff check app alembic tests`：All checks passed。`git check-ignore -v` 确认 `.env` 和 `.mysql-test/` 内文件均被忽略；无密码 root 连接返回 1045。
@@ -31,7 +38,7 @@
 
 - 原有 MySQL80 服务（3306）没有项目账号，本次未接入或修改；实际 MySQL 验收在独立的 3307 实例完成。
 - 3307 测试实例当前在后台运行，未配置为 Windows 服务或开机自启；本机重启后需运行 `.mysql-test/start.ps1`。
-- Git 仓库尚无提交或远程地址；忽略规则与模拟暂存已验证，但远程推送内容尚无从检查。
+- 阶段四验收时尚未创建提交或远程地址；随后已创建私有 GitHub 仓库并推送，见上方仓库交付记录。
 - 未从零创建虚拟环境并安装依赖；本次在已有 Python 环境完成依赖核对。
 - 自动化测试有 1 条第三方 TestClient 弃用警告，无失败项。
 
