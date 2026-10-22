@@ -1,0 +1,110 @@
+:root { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #232537; background: #f8f9fc; font-synthesis: none; text-rendering: optimizeLegibility; }
+* { box-sizing: border-box; }
+body { margin: 0; min-width: 320px; }
+a { color: #5b61d6; }
+.app-shell { min-height: 100vh; background: #f8f9fc; }
+.app-sidebar { background: #fff !important; border-right: 1px solid #e9ebf1; }
+.app-sidebar .ant-layout-sider-children { display: flex; flex-direction: column; }
+.brand { display: flex; align-items: center; gap: 11px; color: #24263d; font-size: 19px; font-weight: 760; letter-spacing: -.55px; }
+.app-sidebar .brand { padding: 31px 29px 42px; }
+.brand-mark { display: inline-grid; place-items: center; width: 31px; height: 31px; border-radius: 9px; background: #6066da; color: #fff; font-size: 18px; font-weight: 700; box-shadow: 0 5px 12px #5b61d62b; }
+.nav-caption { color: #9a9cab; font-size: 11px; font-weight: 700; letter-spacing: 1.5px; padding: 0 30px 12px; }
+.app-sidebar .ant-menu, .ant-drawer .ant-menu { border-inline-end: 0 !important; padding: 0 14px; }
+.app-sidebar .ant-menu-item, .ant-drawer .ant-menu-item { height: 43px; line-height: 43px; color: #626579; font-weight: 550; margin: 3px 0; }
+.app-sidebar .ant-menu-item-selected { color: #5b61d6 !important; background: #f0f0ff !important; }
+.sidebar-foot { margin-top: auto; padding: 24px 28px 32px; border-top: 1px solid #f1f1f4; color: #a4a6b4; font-size: 12px; }
+.app-header { height: 70px; line-height: 70px; background: #fff; padding: 0 40px; border-bottom: 1px solid #eceef3; display: flex; align-items: center; gap: 16px; }
+.header-kicker { color: #85899b; font-size: 13px; }
+.header-user { margin-left: auto; display: flex; align-items: center; gap: 11px; }
+.user-avatar { background: #e9e8ff; color: #5b61d6; font-weight: 700; }
+.user-name { font-size: 13px; font-weight: 650; }
+.app-content { min-width: 0; }
+.page-container { max-width: 1390px; margin: 0 auto; padding: 42px 48px 70px; }
+.page-title-row { display: flex; justify-content: space-between; align-items: center; gap: 20px; margin-bottom: 30px; }
+.page-title-row .ant-typography { margin: 8px 0 !important; font-size: 29px; letter-spacing: -.75px; }
+.eyebrow { color: #7479be; font-size: 10px; font-weight: 800; letter-spacing: 2px; }
+.page-subtitle { margin: 0; color: #9295a5; font-size: 14px; }
+.page-alert { margin: 0 0 20px; }
+.content-loading, .page-loading { display: grid; place-items: center; min-height: 50vh; }
+.page-loading { min-height: 100vh; }
+.stats-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-bottom: 24px; }
+.stat-card, .surface-card, .table-surface { border: 1px solid #e9ebf1; box-shadow: 0 3px 16px #22284305; }
+.stat-card .ant-card-body { display: flex; flex-direction: column; min-height: 151px; padding: 22px 24px; }
+.stat-card span { color: #828699; font-size: 13px; }
+.stat-card strong { font-size: 34px; line-height: 1.45; letter-spacing: -1.5px; color: #24263a; }
+.stat-card small { color: #adafbc; font-size: 11px; margin-top: auto; }
+.stat-doing strong { color: #5b61d6; }
+.stat-done strong { color: #42a87b; }
+.surface-card .ant-card-head { min-height: 64px; }
+.surface-card .ant-card-head-title { font-size: 16px; }
+.recent-item { padding: 16px 4px !important; }
+.recent-main { display: flex; align-items: center; gap: 13px; min-width: 0; }
+.recent-main strong { display: block; color: #33364a; }
+.recent-main small { display: block; color: #a0a3b0; margin-top: 4px; }
+.task-dot { flex: 0 0 18px; width: 18px; height: 18px; border: 2px solid #b9bbca; border-radius: 50%; }
+.filters-row { display: flex; align-items: center; gap: 12px; margin: 0 0 16px; }
+.results-count { margin-left: auto; color: #9396a5; font-size: 13px; }
+.table-surface { border-radius: 12px; overflow: hidden; background: #fff; }
+.table-surface .ant-table-thead > tr > th { background: #fbfbfd; color: #8d90a0; font-size: 12px; font-weight: 650; }
+.table-surface .ant-table-tbody > tr > td { padding-top: 18px; padding-bottom: 18px; }
+.task-title-cell strong { display: block; font-weight: 620; }
+.task-title-cell small { display: block; color: #9a9dab; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 310px; margin-top: 3px; }
+.row-actions { display: flex; gap: 2px; }
+.pagination-row { display: flex; justify-content: flex-end; margin-top: 20px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.board-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 17px; align-items: start; }
+.board-column { background: #f0f2f7; border: 1px solid #e8eaf0; border-radius: 13px; min-height: 400px; }
+.board-column-heading { display: flex; align-items: center; gap: 9px; padding: 18px 18px 15px; color: #42455a; font-size: 13px; }
+.board-status-dot { width: 9px; height: 9px; border-radius: 50%; background: #a8aabc; }
+.status-doing { background: #7d83e3; }
+.status-done { background: #57bc89; }
+.board-count { margin-left: auto; background: #e4e6ed; border-radius: 7px; padding: 2px 7px; color: #878a9a; font-size: 11px; }
+.board-column-content { padding: 0 10px 12px; }
+.board-column-content .ant-empty { margin: 50px 0; }
+.board-card { background: #fff; border: 1px solid #e8eaf1; border-radius: 10px; padding: 16px; margin-bottom: 10px; box-shadow: 0 2px 8px #22284306; }
+.board-card strong { color: #33364a; font-size: 13px; }
+.board-card p { color: #9093a3; font-size: 12px; line-height: 1.55; margin: 7px 0 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.board-meta { display: flex; align-items: center; justify-content: space-between; gap: 7px; margin: 16px 0 12px; }
+.board-meta small { color: #a1a3b0; font-size: 11px; text-align: right; }
+.board-status-select { width: 100%; }
+.auth-shell { display: grid; grid-template-columns: minmax(420px, 49%) 1fr; min-height: 100vh; background: #fff; }
+.auth-panel { width: min(420px, calc(100% - 60px)); margin: 0 auto; padding: 52px 0 70px; display: flex; flex-direction: column; }
+.auth-brand { margin-bottom: auto; }
+.auth-intro { margin-top: 72px; }
+.auth-intro .ant-typography { font-size: 31px; letter-spacing: -.7px; margin: 11px 0 8px !important; }
+.auth-intro p { color: #9699a7; margin: 0 0 31px; }
+.auth-panel .ant-form-item { margin-bottom: 19px; }
+.auth-panel .ant-form-item-label label { font-weight: 600; color: #53566b; }
+.auth-panel .ant-btn-primary { height: 44px; margin-top: 6px; font-weight: 650; }
+.form-alert { margin: 0 0 17px; }
+.auth-switch { text-align: center; color: #9b9daa; margin-top: 26px; }
+.auth-switch a { font-weight: 650; margin-left: 4px; }
+.auth-aside { display: flex; flex-direction: column; justify-content: space-between; padding: 16vh 9vw 8vh; background: linear-gradient(150deg, #f0f0fc 0%, #e8e9fa 55%, #dde0f8 100%); overflow: hidden; }
+.auth-aside .eyebrow { color: #656ec3; }
+.auth-aside h2 { color: #303363; font-size: clamp(33px, 4vw, 62px); line-height: 1.18; letter-spacing: -2px; margin: 26px 0 18px; }
+.auth-aside p { color: #7e83a7; max-width: 370px; line-height: 1.8; }
+.auth-aside-lines { height: 220px; border-top: 1px solid #a9acd98a; transform: rotate(-12deg) scale(1.4); box-shadow: 0 -50px 0 -49px #a9acd9, 0 -100px 0 -99px #a9acd9, 0 -150px 0 -149px #a9acd9; opacity: .6; }
+@media (max-width: 1000px) {
+  .page-container { padding: 34px 28px 60px; }
+  .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .board-grid { grid-template-columns: 1fr; }
+  .board-column { min-height: 170px; }
+}
+@media (max-width: 767px) {
+  .app-header { padding: 0 17px; height: 60px; line-height: 60px; }
+  .header-kicker { display: none; }
+  .page-container { padding: 26px 16px 50px; }
+  .page-title-row { align-items: flex-start; margin-bottom: 24px; }
+  .page-title-row .ant-typography { font-size: 25px; }
+  .page-subtitle { font-size: 12px; }
+  .stats-grid { gap: 9px; }
+  .stat-card .ant-card-body { padding: 17px; min-height: 132px; }
+  .stat-card strong { font-size: 29px; }
+  .filters-row { flex-wrap: wrap; }
+  .results-count { flex-basis: 100%; margin: 3px 0; }
+  .auth-shell { display: block; }
+  .auth-panel { min-height: 100vh; padding-top: 30px; }
+  .auth-brand { margin-bottom: 0; }
+  .auth-intro { margin-top: 75px; }
+  .auth-aside { display: none; }
+}

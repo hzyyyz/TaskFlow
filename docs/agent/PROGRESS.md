@@ -2,11 +2,62 @@
 
 ## 当前阶段
 
-阶段四已完成；随后完成 GitHub 仓库交付。自动化测试和独立的本机 MySQL 8.0.46 实库迁移、接口链路均已通过；代码已推送到私有仓库 `hzyyyz/TaskFlow` 的 `main` 分支。验收细目见 [ACCEPTANCE.md](ACCEPTANCE.md)，技术说明见 [INTERVIEW_NOTES.md](INTERVIEW_NOTES.md)。
+阶段五已完成补充验收：移动浏览器视口、错误提示和断网场景通过，详见 [FRONTEND_ACCEPTANCE.md](FRONTEND_ACCEPTANCE.md)。阶段六 Docker Compose 已完成本机运行验收：2026-10-22 安装 Docker Desktop 29.9.2、Compose 5.6.1、WSL 3.0.3 后重启，三服务启动，数据库和后端健康检查通过；同源 API、浏览器流程和重启后数据持久化均实测通过。后端 48 项测试与前端 2 项测试通过。阶段六详情见 [ACCEPTANCE.md](ACCEPTANCE.md)。GitHub 仓库现已公开；本次交付提交包含阶段五和六的实现。
+
+## 阶段六已完成
+
+- 新增根目录 `Dockerfile`、`.dockerignore`、`compose.yaml`；新增 `frontend/Dockerfile`、`frontend/nginx.conf`、`frontend/.dockerignore`。Compose 定义前端、后端、MySQL 8 三服务与数据库命名卷；仅前端发布宿主机端口。
+- MySQL 使用账户查询健康检查；后端等待数据库健康，执行 `alembic upgrade head` 成功后才启动 Uvicorn；前端等待后端健康。后端用非 root 用户，三个服务配置重启和日志轮转。
+- 生产前端 Axios 使用同源相对 API 路径，本地开发继续使用 `VITE_API_BASE_URL`。Nginx 保留 `/api/` 原 URI 代理到 `backend:8000`，SPA 深链接回退至 `index.html`。
+- `.env.example` 增加 Docker 变量占位符；本机被忽略的 `.env` 增加随机 MySQL 密码和 Compose 变量。README 增加部署、排障、备份、停机和回滚说明；`.gitignore` 忽略 `backups/`。
+
+## 阶段六实际命令与结果
+
+- PyYAML 解析 `compose.yaml` 并核对三服务、内部依赖、MySQL 命名卷、健康检查、仅前端发布端口：通过。核对本地 `.env` 含所需 Compose 变量、密码为随机 URL 安全字符且长度不少于 24：通过；`git check-ignore` 确认 `.env`、`frontend/.env.local` 和备份目录被忽略。
+- `npm run build`：成功，3169 个模块；主 JS 约 1160.99 kB，仍有大包提示。检查产物包含 `/api/v1/auth/login` 且不含 `http://localhost:8000`：通过。
+- `npm run test`：2 passed；`npm run lint`：退出码 0，保留原有 5 条 React 规则告警。
+- `python -m pytest -q`：48 passed，1 条第三方弃用警告；`ruff check app alembic tests`：All checks passed；`git diff --check`：退出码 0。
+- 2026-10-22 安装 Docker Desktop 29.9.2、Compose 5.6.1 与 WSL 3.0.3 并重启后，`wsl --status` 显示默认分发 `docker-desktop`、默认版本 2；`docker info` 返回服务端 29.9.2。`docker compose config --quiet` 和 `docker compose up -d --build` 退出码均为 0。`docker compose ps`：db、backend 健康，frontend 运行，仅 `127.0.0.1:8080` 发布到宿主机；后端日志显示 MySQL 上执行 `0001_initial` 迁移。
+- 经 `http://127.0.0.1:8080` 同源入口验收：SPA 首页、登录/注册/工作台/任务/看板深链接与 `/health` 均返回 200；双用户注册、表单登录、`/me`、任务 CRUD、分页、筛选、看板状态、UTC 时间、401/404/422 和跨用户隔离均符合预期。`docker compose restart` 后任务仍在，容器内 `python -m alembic current` 为 `0001_initial (head)`；测试任务随后删除。
+- Chrome 无头浏览器实际完成注册、登录、创建任务、刷新、看板查看、删除、退出和受保护路由跳转。修复 Nginx 转发 `Host` 时丢失宿主机端口的问题：带尾部斜杠的 API 请求现在 307 到 `http://127.0.0.1:8080/api/v1/tasks`，跟随重定向得到预期 401。最终重跑 `python -m pytest -q`：48 passed；`npm run test`：2 passed；`ruff check app alembic tests` 与 `git diff --check` 退出码 0。
+
+## 阶段六遗留问题与下一步
+
+- 本机 Docker 三服务已运行；访问 `http://localhost:8080/`。生产对外部署仍需另行配置 HTTPS、反向代理、密钥管理与定期备份，本阶段未做远程部署。
+- 当前本机的 Docker 数据卷与独立的 Windows MySQL 3307 测试库互不相通；现有测试账号不会自动出现在新容器库中。需要保留数据时按备份/恢复流程迁移。
+- 阶段六只新增部署配置与生产前端地址选择，并将 Nginx 上游 `Host` 改为保留外部端口；没有修改业务 API、认证协议或数据库迁移。
+
+## 阶段五后的 Windows 一键启动入口
+
+- 新增 `start-taskflow.cmd` 与 `scripts/start-taskflow.ps1`、`scripts/run-backend.ps1`、`scripts/run-frontend.ps1`。双击入口复用本机 MySQL 启动脚本，执行 `alembic upgrade head`，启动或复用 8000/5173 端口的服务，并尝试打开前端页面。前端固定 5173 端口，防止自动换端口造成 CORS 不匹配。
+- 实测 `cmd /c start-taskflow.cmd`：MySQL 已运行、迁移成功、前后端就绪，退出码 0。三个 PowerShell 脚本均为 0 个解析错误。
+- 受限执行环境拒绝自动打开浏览器；启动器已改为显示 `http://localhost:5173/`，服务启动不因此报失败。普通桌面双击时自动打开浏览器的行为尚未实测。
+
+## 阶段五已完成
+
+- 新增 `frontend/`：Vite + React + TypeScript、Ant Design、Axios、React Router；包含登录、注册、工作台、任务列表与看板，响应式侧边栏及移动抽屉。
+- 实现统一 API 客户端、Bearer Token、路由保护、刷新后 `/auth/me` 校验、登录表单编码、401 会话退出和各类错误提示。
+- 任务列表支持状态与优先级筛选、分页、创建/编辑/确认删除；看板分页加载并通过 PATCH 修改状态；工作台基于真实 `total` 统计。
+- 后端 `app/main.py` 增加只允许配置的本地前端 Origin 的 CORS；`tests/test_foundation.py` 增加允许/拒绝 Origin 回归测试。既有 API 与数据库迁移未变。
+- 更新根目录 `README.md`、新增 `frontend/README.md` 和 `.env.example`、新增 [FRONTEND_ACCEPTANCE.md](FRONTEND_ACCEPTANCE.md)。
+
+## 阶段五实际运行命令及结果
+
+- `npm install --offline --cache .npm-cache`：成功，125 个包、0 个已知漏洞；此前已完成在线依赖安装并生成 `package-lock.json`。
+- `npm run dev`：本机 Vite 可访问，`http://localhost:5173/` 返回 200；后端 `/health` 返回 200。
+- `npm run test`：2 passed；`npm run lint`：退出码 0、5 条规则告警；`npm run build`：成功，最终主 JS 约 1161.01 kB，存在超过 500 kB 的提示。
+- `python -m pytest -q`：48 passed，1 条第三方弃用警告；`ruff check app alembic tests`：All checks passed。
+- `python -m alembic current`：MySQL `0001_initial (head)`。
+- 真实浏览器联调完成双账号注册/登录、`/me`、任务创建/筛选/编辑/看板变更/删除/退出，以及刷新后的会话恢复；第二账号看不到第一账号数据。具体见前端验收报告。
+
+## 阶段五未验证项与后续
+
+- 2026-10-22 使用隔离 Chrome 上下文补验 390×844 移动视口、抽屉导航、任务创建，以及真实后端的 401/404/409、断网反馈；422 页面反馈用模拟响应验证，后端真实 422 由自动化测试覆盖。实体手机未测。结果见前端验收报告。
+- 阶段五验收时改动尚未提交；本次交付提交包含前端实现。启动时先确保本机 MySQL 测试实例和后端运行，随后在 `frontend/` 运行 `npm install`、`npm run dev`；前端环境变量和 Token 风险见 README。
 
 ## GitHub 仓库交付
 
-- 创建私有仓库 `https://github.com/hzyyyz/TaskFlow`，本地 `origin` 指向其 HTTPS 地址。
+- 最初创建私有仓库 `https://github.com/hzyyyz/TaskFlow`，后来改为公开；本地 `origin` 指向其 HTTPS 地址。
 - 推送前 `python -m pytest -q`：47 passed、1 条第三方弃用警告；`git diff --cached --check`：退出码 0；首次提交 `7dc646d`（`Initial TaskFlow MVP`）。
 - `git push -u origin main`：成功创建远程 `main`，本地 `main` 跟踪 `origin/main`。推送候选文件仅包含项目代码、测试与文档；`.env` 和 `.mysql-test/` 被 Git 忽略。
 - 本进度与验收报告随仓库交付记录同步到远程仓库。

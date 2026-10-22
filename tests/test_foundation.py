@@ -15,6 +15,29 @@ def test_health_and_docs_are_available_without_database():
     assert client.get("/docs").status_code == 200
 
 
+def test_cors_allows_only_configured_frontend_origin():
+    from app.main import app
+
+    client = TestClient(app)
+    headers = {
+        "Access-Control-Request-Method": "GET",
+        "Access-Control-Request-Headers": "authorization",
+    }
+    allowed = client.options(
+        "/api/v1/tasks",
+        headers={**headers, "Origin": "http://localhost:5173"},
+    )
+    assert allowed.status_code == 200
+    assert allowed.headers["access-control-allow-origin"] == "http://localhost:5173"
+
+    denied = client.options(
+        "/api/v1/tasks",
+        headers={**headers, "Origin": "https://untrusted.example"},
+    )
+    assert denied.status_code == 400
+    assert "access-control-allow-origin" not in denied.headers
+
+
 def test_model_metadata_matches_foundation_contract():
     from app.db.base import Base
     import app.models  # noqa: F401

@@ -20,7 +20,9 @@
 - pytest + HTTPX + FastAPI TestClient（测试可使用独立 SQLite 测试库，确保生产代码仍兼容 MySQL）
 - Uvicorn
 
-**本 MVP 不使用** Redis、Celery、RabbitMQ、前端、Docker、WebSocket、LangChain、微服务、异步 SQLAlchemy。Swagger UI `/docs` 作为接口演示入口。
+**阶段 01～04 后端 MVP 不使用** Redis、Celery、RabbitMQ、前端、Docker、WebSocket、LangChain、微服务、异步 SQLAlchemy。Swagger UI `/docs` 作为后端接口演示入口。
+
+**阶段 05 是唯一允许新增前端的阶段**：在独立 `frontend/` 目录使用 React + Vite + TypeScript + Ant Design + Axios + React Router。前端只调用已有 API，不直接访问数据库；不引入 Redux、Next.js、Zustand 或新后端服务。阶段 05 的具体规则见 `05_FRONTEND.md`。
 
 ## 2. 目录契约
 ```text
@@ -112,3 +114,15 @@ taskflow/
 - 每阶段保留既有 API 契约，必要时补充测试。
 - 运行环境不具备 MySQL 时，可完成代码并报告未执行的数据库验收；不得伪造成功。
 - 只有完成第四阶段且核心测试真实通过后，才可在简历里写“自动化测试覆盖核心认证和权限流程”。
+
+## 7. 阶段 05 前端兼容契约
+- 01～04 文件为后端实现与验收的既定范围，不因前端阶段而改变。
+- 仅在阶段 04 验收完成后进入 05；若真实仓库与本文档有差异，先检查 OpenAPI 与源码，列出差异并提出最小兼容方案。
+- 登录使用 OAuth2PasswordRequestForm：POST /api/v1/auth/login，Content-Type 为 application/x-www-form-urlencoded，字段 username/password，不发送 JSON。
+- 登录成功返回 access_token、token_type；所有任务请求携带 Authorization: Bearer token。
+- 注册 POST /api/v1/auth/register，当前用户 GET /api/v1/auth/me。
+- 列表 GET /api/v1/tasks 使用 page/page_size/status/priority，返回 items/total/page/page_size；不能假设有搜索、汇总或批量查询接口。
+- Dashboard 总数统计只能基于真实 API：可通过按状态请求 page_size=1 读取 total，分别计算 todo/doing/done；若不加筛选的 total 与状态和不一致，应显示可信数据并记录原因，禁止用当前页 items.length 当全量总数。
+- 看板仅通过现有 PATCH /api/v1/tasks/{task_id} 修改 status；可分页加载全部任务后分列显示，必须处理加载上限和失败状态；首版不要求拖拽。
+- API 返回 401 时清除前端认证状态并跳转登录；404 不泄露其他用户资源；422 显示校验错误；删除成功 204 无响应体。
+- 前端本地开发配置 VITE_API_BASE_URL，后端 CORS 仅允许配置的开发前端源；如必须新增 CORS 配置，应为最小兼容性变更并完成后端回归测试。

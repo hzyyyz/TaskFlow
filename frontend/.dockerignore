@@ -1,0 +1,9 @@
+.env*
+node_modules
+.npm-cache
+dist
+dist-ssr
+coverage
+test
+.git
+*.log

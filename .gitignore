@@ -8,3 +8,5 @@ __pycache__/
 .ruff_cache/
 *.db
 .mysql-test/
+backups/
+README_浣跨敤璇存槑.md
